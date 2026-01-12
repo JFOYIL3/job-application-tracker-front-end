@@ -198,18 +198,36 @@ const EditJobApplicationModal: React.FC<EditJobApplicationModalProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Priority
                 </label>
-                <input
-                  type="number"
-                  min={0}
-                  max={5}
-                  value={priority}
-                  onChange={(e) => setPriority(Number(e.target.value))}
-                  disabled={isSubmitting}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 text-gray-900 bg-white"
-                />
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const starValue = index + 1;
+                    const isFilled = starValue <= priority;
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setPriority(starValue)}
+                        disabled={isSubmitting}
+                        className={`
+                          text-2xl transition-all duration-150
+                          ${isFilled ? 'text-yellow-500' : 'text-gray-300'}
+                          hover:scale-110
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1 rounded
+                        `}
+                        aria-label={`Set priority to ${starValue}`}
+                      >
+                        ★
+                      </button>
+                    );
+                  })}
+                </div>
+                {priority > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">{priority} out of 5</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

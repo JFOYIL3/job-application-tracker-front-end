@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import JobApplicationsService from '../services/jobApplicationsService';
+import DualRangeSlider from './DualRangeSlider';
 
 interface NewJobApplicationModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ const NewJobApplicationModal: React.FC<NewJobApplicationModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
-  const [salaryRange, setSalaryRange] = useState({ high_end: 0, low_end: 0 });
+  const [salaryRange, setSalaryRange] = useState({ high_end: 100000, low_end: 0 });
   const [location, setLocation] = useState('');
   const [links, setLinks] = useState<string[]>(['']);
 
@@ -84,7 +85,7 @@ const NewJobApplicationModal: React.FC<NewJobApplicationModalProps> = ({
     if (!isSubmitting) {
       setTitle('');
       setCompany('');
-      setSalaryRange({ high_end: 0, low_end: 0 });
+      setSalaryRange({ high_end: 100000, low_end: 0 });
       setLocation('');
       setLinks(['']);
       setPriority(1);
@@ -160,10 +161,19 @@ const NewJobApplicationModal: React.FC<NewJobApplicationModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Salary Range
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <DualRangeSlider
+                  min={0}
+                  max={500000}
+                  lowValue={salaryRange.low_end || 0}
+                  highValue={salaryRange.high_end || 100000}
+                  onChange={(low, high) => setSalaryRange({ low_end: low, high_end: high })}
+                  disabled={isSubmitting}
+                  step={5000}
+                />
+                <div className="mt-4 grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="salaryLow" className="block text-xs text-gray-600 mb-1">
                       Low End ($)
@@ -172,9 +182,16 @@ const NewJobApplicationModal: React.FC<NewJobApplicationModalProps> = ({
                       type="number"
                       id="salaryLow"
                       value={salaryRange.low_end || ''}
-                      onChange={(e) => setSalaryRange({ ...salaryRange, low_end: Number(e.target.value) || 0 })}
+                      onChange={(e) => {
+                        const newLow = Number(e.target.value) || 0;
+                        setSalaryRange({ 
+                          ...salaryRange, 
+                          low_end: Math.min(newLow, salaryRange.high_end || 100000)
+                        });
+                      }}
                       disabled={isSubmitting}
                       min="0"
+                      max={salaryRange.high_end || 500000}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 text-gray-900 bg-white"
                       placeholder="0"
                     />
@@ -187,9 +204,16 @@ const NewJobApplicationModal: React.FC<NewJobApplicationModalProps> = ({
                       type="number"
                       id="salaryHigh"
                       value={salaryRange.high_end || ''}
-                      onChange={(e) => setSalaryRange({ ...salaryRange, high_end: Number(e.target.value) || 0 })}
+                      onChange={(e) => {
+                        const newHigh = Number(e.target.value) || 0;
+                        setSalaryRange({ 
+                          ...salaryRange, 
+                          high_end: Math.max(newHigh, salaryRange.low_end || 0)
+                        });
+                      }}
                       disabled={isSubmitting}
-                      min="0"
+                      min={salaryRange.low_end || 0}
+                      max="500000"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 text-gray-900 bg-white"
                       placeholder="0"
                     />

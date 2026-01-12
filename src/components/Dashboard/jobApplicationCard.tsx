@@ -71,35 +71,34 @@ const JobApplicationCard: React.FC<JobApplicationCardProps> = ({ jobApplication,
   const links = jobApplication.links || jobAppWithLinks.links || [];
   const validLinks = links.filter(link => link && link.trim() !== '');
 
+  // Format createdAt timestamp
+  const formatCreatedAt = (createdAt?: string | Date) => {
+    if (!createdAt) return null;
+    const date = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+    if (isNaN(date.getTime())) return null;
+    
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+  };
+
   return (
     <div className="relative group border border-gray-200 rounded-lg p-4 mb-3 bg-white shadow-sm hover:shadow-md transition-shadow">
-      {/* Edit and Delete buttons, only visible on hover */}
-      <button
-        onClick={handleEditClick}
-        className={`
-          absolute top-2 right-10 
-          opacity-0 group-hover:opacity-100 transition-opacity 
-          text-blue-500 hover:text-blue-700 
-          rounded-full p-1 text-lg 
-          bg-white hover:bg-blue-100
-        `}
-        aria-label="Edit application"
-      >
-        ✏️
-      </button>
-      <button
-        onClick={handleDeleteClick}
-        className={`
-          absolute top-2 right-2 
-          opacity-0 group-hover:opacity-100 transition-opacity 
-          text-red-500 hover:text-red-700 
-          rounded-full p-1 text-xl 
-          bg-white hover:bg-red-100
-        `}
-        aria-label="Delete application"
-      >
-        ×
-      </button>
+      {/* CreatedAt timestamp at top right */}
+      {jobApplication.createdAt && (
+        <div className="absolute top-2 right-2 text-xs text-gray-400 z-10">
+          {formatCreatedAt(jobApplication.createdAt)}
+        </div>
+      )}
       <h3 className="text-lg font-semibold text-gray-800 mb-2">{jobApplication.title}</h3>
       <p className="text-gray-600 font-medium mb-2">{jobApplication.company}</p>
       {jobApplication.location && (
@@ -146,25 +145,45 @@ const JobApplicationCard: React.FC<JobApplicationCardProps> = ({ jobApplication,
         </div>
       )}
       <div className="flex items-center justify-between mt-3">
-        <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(jobApplication.status)}`}>
-          {formatStatus(jobApplication.status)}
-        </span>
-        {priorityValue > 0 && (
-          <div className="flex items-center gap-0.5">
-            {Array.from({ length: maxPriority }).map((_, index) => (
-              <span
-                key={index}
-                className={`text-sm ${
-                  index < priorityValue
-                    ? 'text-yellow-500'
-                    : 'text-gray-300'
-                }`}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(jobApplication.status)}`}>
+            {formatStatus(jobApplication.status)}
+          </span>
+          {priorityValue > 0 && (
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: maxPriority }).map((_, index) => (
+                <span
+                  key={index}
+                  className={`text-sm ${
+                    index < priorityValue
+                      ? 'text-yellow-500'
+                      : 'text-gray-300'
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* Edit and Delete buttons at bottom right */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleEditClick}
+            className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+            aria-label="Edit application"
+          >
+            Edit
+          </button>
+          <span className="text-gray-300">|</span>
+          <button
+            onClick={handleDeleteClick}
+            className="text-gray-500 hover:text-gray-700 text-sm font-medium"
+            aria-label="Delete application"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );

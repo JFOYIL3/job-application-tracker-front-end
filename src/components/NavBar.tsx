@@ -13,6 +13,7 @@ const NavBar: React.FC<NavBarProps> = ({ activeView, onNavigate, onNewApplicatio
     { id: 'applied', label: 'Applied', bgColor: 'bg-blue-600', icon: '📊' },
     { id: 'rejected', label: 'Rejected', bgColor: 'bg-red-600', icon: '📝' },
     { id: 'graveyard', label: 'Graveyard', bgColor: 'bg-gray-600', icon: '⚙️' },
+    { id: 'all', label: 'All Applications', bgColor: 'bg-indigo-600', icon: '📋' },
   ];
 
   return (

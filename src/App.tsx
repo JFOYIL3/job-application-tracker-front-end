@@ -85,7 +85,12 @@ function App() {
 
   // Filter job applications based on active view (status) and search query
   const filteredApplications = useMemo(() => {
-    let filtered = jobApplications.filter(app => app.status === activeView || (!app.status && activeView === 'applied'))
+    let filtered = jobApplications
+    
+    // If not 'all' view, filter by status
+    if (activeView !== 'all') {
+      filtered = jobApplications.filter(app => app.status === activeView || (!app.status && activeView === 'applied'))
+    }
     
     // Apply search filter if search query exists
     if (searchQuery.trim()) {
@@ -112,7 +117,7 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold text-gray-800">
-              {activeView.charAt(0).toUpperCase() + activeView.slice(1)}
+              {activeView === 'all' ? 'All Applications' : activeView.charAt(0).toUpperCase() + activeView.slice(1)}
             </h1>
             {!isLoading && (
               <p className="text-gray-600">

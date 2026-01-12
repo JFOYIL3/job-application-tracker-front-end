@@ -7,4 +7,5 @@ export interface JobApplication {
     salaryRange?: { high_end: number; low_end: number };
     priority?: number;
     links?: string[];
+    createdAt?: string | Date;
   }
